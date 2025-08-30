@@ -6,9 +6,11 @@ interface GenerateRequest {
   appType: 'mobile' | 'web';
 }
 
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY!,
-});
+const openai = process.env.OPENAI_API_KEY 
+  ? new OpenAI({
+      apiKey: process.env.OPENAI_API_KEY,
+    })
+  : null;
 
 async function generateAIContent(idea: string, appType: 'mobile' | 'web'): Promise<string> {
   const appTypeRu = appType === 'web' ? 'веб-приложения' : 'мобильного приложения';
@@ -27,6 +29,10 @@ async function generateAIContent(idea: string, appType: 'mobile' | 'web'): Promi
 Ответ должен быть на русском языке в формате Markdown. Будь конкретным и практичным в рекомендациях.`;
 
   try {
+    if (!openai) {
+      throw new Error('OpenAI не инициализирован');
+    }
+    
     const completion = await openai.chat.completions.create({
       model: "gpt-4",
       messages: [

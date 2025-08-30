@@ -20,7 +20,16 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const supabase = createServiceSupabase();
+    let supabase;
+    try {
+      supabase = createServiceSupabase();
+    } catch (error) {
+      console.error('Ошибка инициализации Supabase:', error);
+      return NextResponse.json(
+        { error: 'Сервер временно недоступен. Попробуйте позже.' },
+        { status: 503 }
+      );
+    }
 
     // Ищем пользователя по email
     const { data: user, error } = await supabase
